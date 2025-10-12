@@ -102,23 +102,36 @@ app.get('/api/products', async (req, res) => {
 
 // POST produk baru (terhubung dengan user)
 app.post('/api/products', authenticateToken, async (req, res) => {
-    const { name, description, price } = req.body;
-    const authorId = req.user.userId; // Ambil ID user dari token JWT
+    // Ambil semua data dari body
+    let { name, description, price, color, category } = req.body;
+    const authorId = req.user.userId;
+
+    // Pastikan price adalah angka yang valid
+    const parsedPrice = parseFloat(price);
+    if (isNaN(parsedPrice)) {
+        return res.status(400).json({ message: 'Harga harus berupa angka yang valid.' });
+    }
 
     try {
         const newProduct = await prisma.product.create({
             data: {
                 name,
-                description,
-                price: parseFloat(price),
-                color,
-                category,
-                author: { connect: { id: authorId } }, // Hubungkan produk dengan user
+                // Jika description, color, atau category kosong, set ke undefined
+                // agar Prisma mengisinya dengan NULL di database.
+                description: description || undefined,
+                price: parsedPrice,
+                color: color || undefined,
+                category: category || undefined,
+                author: { connect: { id: authorId } },
             },
         });
         res.status(201).json(newProduct);
     } catch (error) {
-        res.status(400).json({ message: 'Failed to create product', error: error.message });
+        // Kirim pesan error yang lebih spesifik dari Prisma
+        res.status(400).json({ 
+            message: 'Gagal membuat produk, periksa data Anda.', 
+            error: error.message 
+        });
     }
 });
 
