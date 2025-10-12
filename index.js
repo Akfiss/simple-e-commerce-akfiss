@@ -111,6 +111,8 @@ app.post('/api/products', authenticateToken, async (req, res) => {
                 name,
                 description,
                 price: parseFloat(price),
+                color,
+                category,
                 author: { connect: { id: authorId } }, // Hubungkan produk dengan user
             },
         });
@@ -129,9 +131,9 @@ app.put('/api/products/:id', authenticateToken, async (req, res) => {
     if (!product) return res.status(404).json({ message: 'Product not found' });
     if (product.authorId !== userId) return res.status(403).json({ message: 'Forbidden: You are not the owner' });
     
-    const { name, description, price } = req.body;
+    const { name, description, price, color, category } = req.body;
     try {
-        const updatedProduct = await prisma.product.update({ where: { id: parseInt(id) }, data: { name, description, price: parseFloat(price) }});
+        const updatedProduct = await prisma.product.update({ where: { id: parseInt(id) }, data: { name, description, price: parseFloat(price), color, category }});
         res.status(200).json(updatedProduct);
     } catch (error) {
         res.status(500).json({ message: 'Failed to update product' });
