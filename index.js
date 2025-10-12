@@ -77,65 +77,81 @@ app.post('/api/login', async (req, res) => {
 // --- MIDDLEWARE untuk melindungi route ---
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-    if (token == null) {
-        return res.sendStatus(401); // Unauthorized
-    }
-
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.sendStatus(403); // Forbidden
-        }
-        req.user = user;
+        if (err) return res.sendStatus(403);
+        req.user = user; // Menyimpan data user (dari token) ke object request
         next();
     });
 };
 
 
-// --- ENDPOINTS PRODUK (sekarang dilindungi) ---
+// --- ENDPOINTS PRODUK (SEKARANG DENGAN LOGIKA KEPEMILIKAN) ---
 
+// GET semua produk (tetap publik)
 app.get('/api/products', async (req, res) => {
-    // Endpoint ini kita biarkan publik
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({
+        // Sertakan data pembuatnya di dalam respons
+        include: { author: { select: { name: true, email: true } } },
+    });
     res.status(200).json(products);
 });
 
-// Endpoint di bawah ini sekarang memerlukan autentikasi
+// POST produk baru (terhubung dengan user)
 app.post('/api/products', authenticateToken, async (req, res) => {
     const { name, description, price } = req.body;
-    // ... (logika membuat produk sama seperti sebelumnya) ...
-     try {
-        const newProduct = await prisma.product.create({ data: { name, description, price: parseFloat(price) } });
+    const authorId = req.user.userId; // Ambil ID user dari token JWT
+
+    try {
+        const newProduct = await prisma.product.create({
+            data: {
+                name,
+                description,
+                price: parseFloat(price),
+                author: { connect: { id: authorId } }, // Hubungkan produk dengan user
+            },
+        });
         res.status(201).json(newProduct);
     } catch (error) {
         res.status(400).json({ message: 'Failed to create product', error: error.message });
     }
 });
 
+// PUT produk (hanya oleh pemilik)
 app.put('/api/products/:id', authenticateToken, async (req, res) => {
-    // ... (logika update produk sama seperti sebelumnya) ...
-     const { id } = req.params;
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const product = await prisma.product.findUnique({ where: { id: parseInt(id) } });
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (product.authorId !== userId) return res.status(403).json({ message: 'Forbidden: You are not the owner' });
+    
     const { name, description, price } = req.body;
     try {
         const updatedProduct = await prisma.product.update({ where: { id: parseInt(id) }, data: { name, description, price: parseFloat(price) }});
         res.status(200).json(updatedProduct);
     } catch (error) {
-        res.status(404).json({ message: 'Product not found' });
+        res.status(500).json({ message: 'Failed to update product' });
     }
 });
 
+// DELETE produk (hanya oleh pemilik)
 app.delete('/api/products/:id', authenticateToken, async (req, res) => {
-    // ... (logika delete produk sama seperti sebelumnya) ...
-     const { id } = req.params;
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const product = await prisma.product.findUnique({ where: { id: parseInt(id) } });
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (product.authorId !== userId) return res.status(403).json({ message: 'Forbidden: You are not the owner' });
+
     try {
         await prisma.product.delete({ where: { id: parseInt(id) } });
         res.status(204).send(); // No Content
     } catch (error) {
-        res.status(404).json({ message: 'Product not found' });
+        res.status(500).json({ message: 'Failed to delete product' });
     }
 });
-
 
 // Jalankan Server
 const PORT = process.env.PORT || 3000;
