@@ -1,11 +1,13 @@
 // index.js
 const express = require('express');
+const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Kunci rahasia untuk JWT. Simpan ini di file .env di aplikasi sungguhan!
