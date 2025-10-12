@@ -135,6 +135,25 @@ app.post('/api/products', authenticateToken, async (req, res) => {
     }
 });
 
+// GET satu produk berdasarkan ID (publik)
+app.get('/api/products/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const product = await prisma.product.findUnique({
+            where: { id: parseInt(id) },
+            include: { author: { select: { name: true, email: true } } }, // Sertakan info pembuat
+        });
+
+        if (!product) {
+            return res.status(404).json({ message: 'Produk tidak ditemukan' });
+        }
+
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ message: 'Terjadi kesalahan pada server', error: error.message });
+    }
+});
+
 // PUT produk (hanya oleh pemilik)
 app.put('/api/products/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
