@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,15 +11,23 @@ datasource db {
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
-  description String?  // Tanda '?' berarti opsional
+  description String?
   price       Float
   color       String?
-  category    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
+  // Relasi ke User (Penjual/Pembuat Produk)
+  author   User @relation(fields: [authorId], references: [id])
+  authorId Int
+
+  // Relasi ke Category
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  // Relasi ke item di keranjang dan pesanan
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
 }
 
 // Model untuk Pengguna
@@ -35,5 +37,82 @@ model User {
   name      String?
   password  String
   createdAt DateTime @default(now())
-  products  Product[]
+
+  // Relasi ke produk yang dibuat/dijual
+  products Product[]
+
+  // Relasi ke keranjang belanja (satu user punya satu keranjang)
+  cart Cart?
+
+  // Relasi ke pesanan (satu user bisa punya banyak pesanan)
+  orders Order[]
+}
+
+// Model untuk Kategori Produk
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  products    Product[]
+}
+
+// Model untuk Keranjang Belanja
+model Cart {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relasi ke User (pemilik keranjang)
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique // @unique memastikan satu user hanya punya satu cart
+
+  // Relasi ke item-item di dalam keranjang
+  items CartItem[]
+}
+
+// Model untuk Item di dalam Keranjang
+model CartItem {
+  id Int @id @default(autoincrement())
+
+  // Relasi ke Keranjang
+  cart   Cart @relation(fields: [cartId], references: [id])
+  cartId Int
+
+  // Relasi ke Produk
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  quantity Int
+}
+
+// Model untuk Pesanan (Order)
+model Order {
+  id             Int       @id @default(autoincrement())
+  orderDate      DateTime  @default(now())
+  totalAmount    Float
+  status         String    // misal: "PENDING", "PAID", "SHIPPED"
+  shippingAddress String
+
+  // Relasi ke User (pemesan)
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  // Relasi ke item-item di dalam pesanan
+  items OrderItem[]
+}
+
+// Model untuk Item di dalam Pesanan
+model OrderItem {
+  id Int @id @default(autoincrement())
+
+  // Relasi ke Pesanan
+  order   Order @relation(fields: [orderId], references: [id])
+  orderId Int
+
+  // Relasi ke Produk
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  quantity Int
+  price    Float // Menyimpan harga produk saat transaksi
 }
