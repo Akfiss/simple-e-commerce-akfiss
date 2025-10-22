@@ -2,27 +2,27 @@
 
 
 
-Project ini adalah sebuah RESTful API sederhana untuk aplikasi e-commerce yang dibangun menggunakan Node.js, Express, dan Prisma.
+This project is a simple RESTful API for an e-commerce application built with Node.js, Express, and Prisma.
 
 
 
-## Fitur Utama
+## Main Features
 
 
 
-* **Autentikasi Pengguna:** Registrasi dan login pengguna dengan JWT (JSON Web Token).
+* **User Authentication:** User registration and login with JWT (JSON Web Token).
 
-* **Manajemen Produk:** Operasi CRUD (Create, Read, Update, Delete) untuk produk.
+* **Product Management:** CRUD (Create, Read, Update, Delete) operations for products.
 
-* **Manajemen Kategori:** Operasi CRUD untuk kategori produk.
+* **Category Management:** CRUD operations for product categories.
 
-* **Keranjang Belanja:** Menambah, melihat, dan menghapus item dari keranjang belanja.
+* **Shopping Cart:** Add, view, and remove items from the shopping cart.
 
-* **Manajemen Pesanan:** Membuat dan melihat riwayat pesanan.
+* **Order Management:** Create and view order history.
 
 
 
-## Teknologi yang Digunakan
+## Technologies Used
 
 
 
@@ -30,31 +30,31 @@ Project ini adalah sebuah RESTful API sederhana untuk aplikasi e-commerce yang d
 
 * **Database ORM:** Prisma
 
-* **Database:** (Sesuai dengan konfigurasi Prisma Anda, contoh: PostgreSQL, MySQL, SQLite)
+* **Database:** (According to your Prisma configuration, e.g., PostgreSQL, MySQL, SQLite)
 
-* **Autentikasi:** bcryptjs untuk hashing password, jsonwebtoken untuk otentikasi berbasis token.
+* **Authentication:** bcryptjs for password hashing, jsonwebtoken for token-based authentication.
 
-* **Lainnya:** Cors untuk Cross-Origin Resource Sharing, Nodemon untuk development.
-
-
-
-## Prasyarat Instalasi
+* **Others:** Cors for Cross-Origin Resource Sharing, Nodemon for development.
 
 
 
-Sebelum memulai, pastikan Anda telah menginstal:
+## Prerequisites
 
 
 
-* [Node.js](https://nodejs.org/en/) (versi 14 atau lebih tinggi)
-
-* [npm](https://www.npmjs.com/) (biasanya terinstal bersama Node.js)
-
-* Database (contoh: [PostgreSQL](https://www.postgresql.org/))
+Before you begin, ensure you have installed:
 
 
 
-## Susunan Proyek
+* [Node.js](https://nodejs.org/en/) (version 14 or higher)
+
+* [npm](https://www.npmjs.com/) (usually installed with Node.js)
+
+* A database (e.g., [PostgreSQL](https://www.postgresql.org/))
+
+
+
+## Project Structure
 
 .
 
@@ -102,11 +102,11 @@ Sebelum memulai, pastikan Anda telah menginstal:
 
 └── README.md
 
-## Contoh Penggunaan
+## Usage
 
 
 
-1.  **Clone repository ini:**
+1.  **Clone this repository:**
 
 
 
@@ -132,11 +132,11 @@ Sebelum memulai, pastikan Anda telah menginstal:
 
 
 
-3.  **Konfigurasi database Anda di `prisma/schema.prisma` dan file `.env`.**
+3.  **Configure your database in `prisma/schema.prisma` and your `.env` file.**
 
 
 
-4.  **Jalankan migrasi database:**
+4.  **Run the database migration:**
 
 
 
@@ -148,7 +148,7 @@ Sebelum memulai, pastikan Anda telah menginstal:
 
 
 
-5.  **Jalankan aplikasi:**
+5.  **Run the application:**
 
 
 
@@ -170,16 +170,17 @@ Sebelum memulai, pastikan Anda telah menginstal:
 
 
 
-## Kontribusi
+## Contributing
 
 
 
-Kontribusi sangat diterima! Jika Anda ingin berkontribusi, silakan fork repositori ini dan buat pull request.
+Contributions are very welcome! If you'd like to contribute, please fork this repository and create a pull request.
 
 
 
-## Lisensi
+## License
 
 
 
-Proyek ini dilisensikan di bawah [Lisensi MIT](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
+
